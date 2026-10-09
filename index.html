@@ -1,0 +1,462 @@
+<html>
+        <head><title>Downloaded HTML</title></head>
+        <body>
+            <pre style="white-space: pre-wrap; word-wrap: break-word;"><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Schedule</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111827;
+      color: #ffffff;
+      margin: 0;
+      padding: 16px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+      margin: 0 0 4px 0;
+      font-size: 24px;
+    }
+    .sub {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    .notif-btn {
+      width: 100%;
+      background-color: #ec4899;
+      color: #ffffff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+    .day-selector {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .day-btn {
+      flex: 1;
+      background-color: #1f2937;
+      color: #9ca3af;
+      border: 1px solid #374151;
+      padding: 10px 0;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .day-btn.active {
+      background-color: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+    .box {
+      background-color: #1f2937;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-left: 5px solid #38bdf8;
+    }
+    .box h2 {
+      margin: 0 0 6px 0;
+      font-size: 12px;
+      color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .now-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+    .now-time {
+      font-size: 13px;
+      color: #9ca3af;
+      margin-bottom: 12px;
+    }
+    .next-title {
+      font-size: 14px;
+      color: #e5e7eb;
+      padding-top: 10px;
+      border-top: 1px solid #374151;
+    }
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .item {
+      background-color: #1f2937;
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #374151;
+    }
+    .item.active-class {
+      border-color: #38bdf8;
+      background-color: #0c4a6e;
+    }
+    .item-name {
+      font-weight: bold;
+      font-size: 14px;
+      color: #ffffff;
+    }
+    .item-room {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .item-time {
+      font-weight: bold;
+      font-size: 13px;
+      color: #38bdf8;
+      text-align: right;
+    }
+    .weekend-box {
+      background-color: #1f2937;
+      padding: 30px 16px;
+      text-align: center;
+      border-radius: 10px;
+      border: 1px solid #374151;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Student Class Schedule</h1>
+  <div class="sub" id="indicator">Checking day...</div>
+
+  <button class="notif-btn" id="notif-btn" onclick="requestAlerts()">🔔 Enable Class Notifications</button>
+
+  <div class="day-selector" id="day-selector">
+    <button class="day-btn" id="b1" onclick="setDay(1)">Day 1</button>
+    <button class="day-btn" id="b2" onclick="setDay(2)">Day 2</button>
+    <button class="day-btn" id="b3" onclick="setDay(3)">Day 3</button>
+    <button class="day-btn" id="b4" onclick="setDay(4)">Day 4</button>
+    <button class="day-btn" id="b5" onclick="setDay(5)">Day 5</button>
+  </div>
+
+  <div class="box" id="status-box">
+    <h2>Now & Next</h2>
+    <div class="now-title" id="now-class">--</div>
+    <div class="now-time" id="now-time">--</div>
+    <div class="next-title">Next: <strong id="next-class">--</strong></div>
+  </div>
+
+  <div class="list" id="schedule-list"></div>
+
+  <div class="weekend-box" id="weekend-box" style="display: none;">
+    <h2 style="font-size: 28px; color: #ec4899; margin: 0 0 8px 0;">WEEKEND! 🎉</h2>
+    <p style="color: #9ca3af; margin: 0;">No classes today. Enjoy your break!</p>
+  </div>
+</div>
+
+<script>
+  var schedule = {
+    1: [
+      { period: "Period 1", name: "Language w/ Azuma", room: "Room 201", start: "09:15", end: "09:45", startMin: 555, endMin: 585 },
+      { period: "Period 2", name: "Language w/ Azuma", room: "Room 201", start: "09:45", end: "10:15", startMin: 585, endMin: 615 },
+      { period: "Period 3", name: "Language w/ Azuma", room: "Room 201", start: "10:15", end: "10:45", startMin: 615, endMin: 645 },
+      { period: "Recess", name: "Morning Recess", room: "", start: "10:45", end: "11:00", startMin: 645, endMin: 660 },
+      { period: "Period 4", name: "Math w/ Teminski", room: "Room 203", start: "11:00", end: "11:30", startMin: 660, endMin: 690 },
+      { period: "Period 5", name: "Math w/ Teminski", room: "Room 203", start: "11:30", end: "12:00", startMin: 690, endMin: 720 },
+      { period: "Lunch", name: "Lunch Eating & Recess", room: "", start: "12:00", end: "13:00", startMin: 720, endMin: 780 },
+      { period: "Period 6", name: "Art w/ Bolhuis", room: "Room 203", start: "13:00", end: "13:30", startMin: 780, endMin: 810 },
+      { period: "Period 7", name: "Art w/ Bolhuis", room: "Room 203", start: "13:30", end: "14:00", startMin: 810, endMin: 840 },
+      { period: "Period 8", name: "French w/ Patel", room: "Room 203", start: "14:00", end: "14:30", startMin: 840, endMin: 870 },
+      { period: "Recess", name: "Afternoon Recess", room: "", start: "14:30", end: "14:45", startMin: 870, endMin: 885 },
+      { period: "Period 9", name: "Music w/ Maxwell", room: "Room 230", start: "14:45", end: "15:15", startMin: 885, endMin: 915 },
+      { period: "Period 10", name: "Gym w/ Azuma", room: "", start: "15:15", end: "15:45", startMin: 915, endMin: 945 }
+    ],
+    2: [
+      { period: "Period 1", name: "Language w/ Azuma", room: "Room 201", start: "09:15", end: "09:45", startMin: 555, endMin: 585 },
+      { period: "Period 2", name: "Language w/ Azuma", room: "Room 201", start: "09:45", end: "10:15", startMin: 585, endMin: 615 },
+      { period: "Period 3", name: "Language w/ Azuma", room: "Room 201", start: "10:15", end: "10:45", startMin: 615, endMin: 645 },
+      { period: "Recess", name: "Morning Recess", room: "", start: "10:45", end: "11:00", startMin: 645, endMin: 660 },
+      { period: "Period 4", name: "History/Geography w/ Rowntree", room: "Room 201", start: "11:00", end: "11:30", startMin: 660, endMin: 690 },
+      { period: "Period 5", name: "History/Geography w/ Rowntree", room: "Room 201", start: "11:30", end: "12:00", startMin: 690, endMin: 720 },
+      { period: "Lunch", name: "Lunch Eating & Recess", room: "", start: "12:00", end: "13:00", startMin: 720, endMin: 780 },
+      { period: "Period 6", name: "French w/ Patel", room: "Room 201", start: "13:00", end: "13:30", startMin: 780, endMin: 810 },
+      { period: "Period 7", name: "French w/ Patel", room: "Room 201", start: "13:30", end: "14:00", startMin: 810, endMin: 840 },
+      { period: "Period 8", name: "Math w/ Teminski", room: "Room 201", start: "14:00", end: "14:30", startMin: 840, endMin: 870 },
+      { period: "Recess", name: "Afternoon Recess", room: "", start: "14:30", end: "14:45", startMin: 870, endMin: 885 },
+      { period: "Period 9", name: "Math w/ Teminski", room: "Room 201", start: "14:45", end: "15:15", startMin: 885, endMin: 915 },
+      { period: "Period 10", name: "Gym w/ Azuma (7/8 T w/ Hamley)", room: "", start: "15:15", end: "15:45", startMin: 915, endMin: 945 }
+    ],
+    3: [
+      { period: "Period 1", name: "Language w/ Azuma", room: "Room 201", start: "09:15", end: "09:45", startMin: 555, endMin: 585 },
+      { period: "Period 2", name: "Language w/ Azuma", room: "Room 201", start: "09:45", end: "10:15", startMin: 585, endMin: 615 },
+      { period: "Period 3", name: "Language w/ Azuma", room: "Room 201", start: "10:15", end: "10:45", startMin: 615, endMin: 645 },
+      { period: "Recess", name: "Morning Recess", room: "", start: "10:45", end: "11:00", startMin: 645, endMin: 660 },
+      { period: "Period 4", name: "Math w/ Teminski", room: "Room 201", start: "11:00", end: "11:30", startMin: 660, endMin: 690 },
+      { period: "Period 5", name: "Math w/ Teminski", room: "Room 201", start: "11:30", end: "12:00", startMin: 690, endMin: 720 },
+      { period: "Lunch", name: "Lunch Eating & Recess", room: "", start: "12:00", end: "13:00", startMin: 720, endMin: 780 },
+      { period: "Period 6", name: "Science w/ Azuma", room: "Room 201", start: "13:00", end: "13:30", startMin: 780, endMin: 810 },
+      { period: "Period 7", name: "Science w/ Azuma", room: "Room 201", start: "13:30", end: "14:00", startMin: 810, endMin: 840 },
+      { period: "Period 8", name: "French w/ Patel", room: "Room 201", start: "14:00", end: "14:30", startMin: 840, endMin: 870 },
+      { period: "Recess", name: "Afternoon Recess", room: "", start: "14:30", end: "14:45", startMin: 870, endMin: 885 },
+      { period: "Period 9", name: "Gym w/ Azuma (6/7R w/ Patel)", room: "", start: "14:45", end: "15:15", startMin: 885, endMin: 915 },
+      { period: "Period 10", name: "Hist/Geo w/ Rowntree", room: "Room 201", start: "15:15", end: "15:45", startMin: 915, endMin: 945 }
+    ],
+    4: [
+      { period: "Period 1", name: "Hist/Geo w/ Rowntree", room: "Room 201", start: "09:15", end: "09:45", startMin: 555, endMin: 585 },
+      { period: "Period 2", name: "Language w/ Azuma", room: "Room 201", start: "09:45", end: "10:15", startMin: 585, endMin: 615 },
+      { period: "Period 3", name: "Language w/ Azuma", room: "Room 201", start: "10:15", end: "10:45", startMin: 615, endMin: 645 },
+      { period: "Recess", name: "Morning Recess", room: "", start: "10:45", end: "11:00", startMin: 645, endMin: 660 },
+      { period: "Period 4", name: "Language w/ Azuma", room: "Room 201", start: "11:00", end: "11:30", startMin: 660, endMin: 690 },
+      { period: "Period 5", name: "Health w/ Dunn", room: "Room 201", start: "11:30", end: "12:00", startMin: 690, endMin: 720 },
+      { period: "Lunch", name: "Lunch Eating & Recess", room: "", start: "12:00", end: "13:00", startMin: 720, endMin: 780 },
+      { period: "Period 6", name: "French w/ Patel", room: "Room 201", start: "13:00", end: "13:30", startMin: 780, endMin: 810 },
+      { period: "Period 7", name: "French w/ Patel", room: "Room 201", start: "13:30", end: "14:00", startMin: 810, endMin: 840 },
+      { period: "Period 8", name: "Math w/ Teminski", room: "Room 201", start: "14:00", end: "14:30", startMin: 840, endMin: 870 },
+      { period: "Recess", name: "Afternoon Recess", room: "", start: "14:30", end: "14:45", startMin: 870, endMin: 885 },
+      { period: "Period 9", name: "Math w/ Teminski", room: "Room 201", start: "14:45", end: "15:15", startMin: 885, endMin: 915 },
+      { period: "Period 10", name: "Gym w/ Azuma", room: "", start: "15:15", end: "15:45", startMin: 915, endMin: 945 }
+    ],
+    5: [
+      { period: "Period 1", name: "Homeroom w/ Azuma", room: "Room 230", start: "09:15", end: "09:45", startMin: 555, endMin: 585 },
+      { period: "Period 2", name: "Math w/ Teminski", room: "Room 230", start: "09:45", end: "10:15", startMin: 585, endMin: 615 },
+      { period: "Period 3", name: "Math w/ Teminski", room: "Room 230", start: "10:15", end: "10:45", startMin: 615, endMin: 645 },
+      { period: "Recess", name: "Morning Recess", room: "", start: "10:45", end: "11:00", startMin: 645, endMin: 660 },
+      { period: "Period 4", name: "Science w/ Azuma", room: "Room 201", start: "11:00", end: "11:30", startMin: 660, endMin: 690 },
+      { period: "Period 5", name: "French w/ Patel", room: "Room 201", start: "11:30", end: "12:00", startMin: 690, endMin: 720 },
+      { period: "Lunch", name: "Lunch Eating & Recess", room: "", start: "12:00", end: "13:00", startMin: 720, endMin: 780 },
+      { period: "Period 6", name: "Language w/ Azuma", room: "Room 201", start: "13:00", end: "13:30", startMin: 780, endMin: 810 },
+      { period: "Period 7", name: "Language w/ Azuma", room: "Room 201", start: "13:30", end: "14:00", startMin: 810, endMin: 840 },
+      { period: "Period 8", name: "Language w/ Azuma", room: "Room 201", start: "14:00", end: "14:30", startMin: 840, endMin: 870 },
+      { period: "Recess", name: "Afternoon Recess", room: "", start: "14:30", end: "14:45", startMin: 870, endMin: 885 },
+      { period: "Period 9", name: "Music w/ Maxwell", room: "Room 230", start: "14:45", end: "15:15", startMin: 885, endMin: 915 },
+      { period: "Period 10", name: "Music w/ Maxwell", room: "Room 230", start: "15:15", end: "15:45", startMin: 915, endMin: 945 }
+    ]
+  };
+
+  var activeDay = 4;
+  var isWeekendDay = false;
+  var notifiedClassKey = "";
+
+  function findCurrentDay() {
+    var now = new Date();
+    var dayOfWeek = now.getDay(); // 0 = Sun, 6 = Sat
+
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      return "WEEKEND";
+    }
+
+    // Anchor Date: Oct 9, 2026 (Day 4)
+    var anchorDate = new Date(2026, 9, 9);
+    var anchorDay = 4;
+
+    var todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var anchorMidnight = new Date(anchorDate.getFullYear(), anchorDate.getMonth(), anchorDate.getDate());
+
+    var diffDays = Math.round((todayMidnight - anchorMidnight) / 86400000);
+    var calculatedDay = anchorDay;
+
+    if (diffDays > 0) {
+      for (var i = 0; i < diffDays; i++) {
+        var nextDate = new Date(anchorMidnight.getTime() + (i + 1) * 86400000);
+        if (nextDate.getDay() !== 0 && nextDate.getDay() !== 6) {
+          calculatedDay = (calculatedDay % 5) + 1;
+        }
+      }
+    } else if (diffDays < 0) {
+      for (var j = 0; j < Math.abs(diffDays); j++) {
+        var prevDate = new Date(anchorMidnight.getTime() - (j + 1) * 86400000);
+        if (prevDate.getDay() !== 0 && prevDate.getDay() !== 6) {
+          calculatedDay = ((calculatedDay - 2 + 5) % 5) + 1;
+        }
+      }
+    }
+
+    return calculatedDay;
+  }
+
+  function startPage() {
+    var detected = findCurrentDay();
+    var indicator = document.getElementById("indicator");
+    var daySelector = document.getElementById("day-selector");
+    var statusBox = document.getElementById("status-box");
+    var list = document.getElementById("schedule-list");
+    var weekendBox = document.getElementById("weekend-box");
+
+    if (detected === "WEEKEND") {
+      isWeekendDay = true;
+      indicator.innerHTML = "Today is the Weekend!";
+      daySelector.style.display = "none";
+      statusBox.style.display = "none";
+      list.style.display = "none";
+      weekendBox.style.display = "block";
+    } else {
+      isWeekendDay = false;
+      activeDay = detected;
+      indicator.innerHTML = "Auto-synced to <strong>Day " + detected + "</strong>";
+      daySelector.style.display = "flex";
+      statusBox.style.display = "block";
+      list.style.display = "flex";
+      weekendBox.style.display = "none";
+      setDay(detected);
+    }
+  }
+
+  function setDay(dayNum) {
+    if (isWeekendDay) return;
+    activeDay = dayNum;
+
+    for (var i = 1; i <= 5; i++) {
+      var button = document.getElementById("b" + i);
+      if (button) {
+        if (i === dayNum) {
+          button.className = "day-btn active";
+        } else {
+          button.className = "day-btn";
+        }
+      }
+    }
+
+    drawList();
+    refreshStatus();
+  }
+
+  function drawList() {
+    if (isWeekendDay || !activeDay) return;
+
+    var listEl = document.getElementById("schedule-list");
+    listEl.innerHTML = "";
+
+    var now = new Date();
+    var nowMins = now.getHours() * 60 + now.getMinutes();
+    var dayItems = schedule[activeDay];
+
+    for (var i = 0; i < dayItems.length; i++) {
+      var item = dayItems[i];
+      var isCurrent = nowMins >= item.startMin && nowMins < item.endMin;
+
+      var row = document.createElement("div");
+      row.className = "item" + (isCurrent ? " active-class" : "");
+
+      var leftDiv = document.createElement("div");
+      var titleDiv = document.createElement("div");
+      titleDiv.className = "item-name";
+      titleDiv.appendChild(document.createTextNode(item.period + ": " + item.name));
+
+      var roomDiv = document.createElement("div");
+      roomDiv.className = "item-room";
+      roomDiv.appendChild(document.createTextNode(item.room ? item.room : "School"));
+
+      leftDiv.appendChild(titleDiv);
+      leftDiv.appendChild(roomDiv);
+
+      var rightDiv = document.createElement("div");
+      rightDiv.className = "item-time";
+      rightDiv.appendChild(document.createTextNode(item.start + " - " + item.end));
+
+      row.appendChild(leftDiv);
+      row.appendChild(rightDiv);
+
+      listEl.appendChild(row);
+    }
+  }
+
+  function refreshStatus() {
+    if (isWeekendDay || !activeDay) return;
+
+    var now = new Date();
+    var nowMins = now.getHours() * 60 + now.getMinutes();
+    var dayItems = schedule[activeDay];
+
+    var currentItem = null;
+    var nextItem = null;
+
+    for (var i = 0; i < dayItems.length; i++) {
+      if (nowMins >= dayItems[i].startMin && nowMins < dayItems[i].endMin) {
+        currentItem = dayItems[i];
+        nextItem = dayItems[i + 1] || null;
+        break;
+      } else if (nowMins < dayItems[i].startMin) {
+        nextItem = dayItems[i];
+        break;
+      }
+    }
+
+    var nowClassEl = document.getElementById("now-class");
+    var nowTimeEl = document.getElementById("now-time");
+    var nextClassEl = document.getElementById("next-class");
+
+    if (currentItem) {
+      nowClassEl.innerHTML = currentItem.period + " - " + currentItem.name;
+      nowTimeEl.innerHTML = currentItem.start + " - " + currentItem.end + (currentItem.room ? " (" + currentItem.room + ")" : "");
+
+      var key = currentItem.period + "_" + currentItem.start;
+      if (notifiedClassKey !== key) {
+        sendNotification(currentItem);
+        notifiedClassKey = key;
+      }
+    } else if (nowMins < dayItems[0].startMin) {
+      nowClassEl.innerHTML = "School Has Not Started";
+      nowTimeEl.innerHTML = "Starts at " + dayItems[0].start;
+    } else {
+      nowClassEl.innerHTML = "Classes Done For Today";
+      nowTimeEl.innerHTML = "See you tomorrow!";
+    }
+
+    if (nextItem) {
+      nextClassEl.innerHTML = nextItem.period + ": " + nextItem.name + " (" + nextItem.start + ")";
+    } else {
+      nextClassEl.innerHTML = "None (End of Day)";
+    }
+  }
+
+  function requestAlerts() {
+    if (!("Notification" in window)) {
+      alert("Notifications are not supported in this browser.");
+      return;
+    }
+
+    Notification.requestPermission().then(function(perm) {
+      var btn = document.getElementById("notif-btn");
+      if (perm === "granted") {
+        btn.innerHTML = "✅ Notifications Active";
+        btn.style.backgroundColor = "#16a34a";
+        new Notification("Notifications Active", {
+          body: "You will be alerted when a class starts!"
+        });
+      } else {
+        btn.innerHTML = "❌ Notifications Blocked";
+      }
+    });
+  }
+
+  function sendNotification(item) {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Next Up: " + item.period, {
+        body: item.name + (item.room ? " (" + item.room + ")" : "") + " is starting now!"
+      });
+    }
+  }
+
+  startPage();
+  setInterval(refreshStatus, 10000);
+</script>
+
+</body>
+</html></pre>
+        </body>
+    </html>
